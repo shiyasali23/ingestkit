@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ingestkit-worker
+  namespace: ingestkit
+  labels:
+    app: ingestkit-worker
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: ingestkit-worker
+    spec:
+      serviceAccountName: ingestkit-worker
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: transfer-worker
+          image: ingestkit-worker:latest
+          args: ["worker", "--run-id", "RUN_ID", "--batch-id", "BATCH_ID", "--config", "/etc/ingestkit/pipeline_config.yaml"]
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          env:
+            - name: INGESTKIT_STATE_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ingestkit-secrets
+                  key: state-database-url
+            - name: INGESTKIT_PSEUDONYM_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: ingestkit-secrets
+                  key: pseudonym-salt
+          volumeMounts:
+            - name: pipeline-config
+              mountPath: /etc/ingestkit
+              readOnly: true
+      volumes:
+        - name: pipeline-config
+          configMap:
+            name: ingestkit-pipeline-config

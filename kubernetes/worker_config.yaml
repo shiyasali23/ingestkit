@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingestkit-pipeline-config
+  namespace: ingestkit
+data:
+  pipeline_config.yaml: |
+    source_path: s3://ingestkit-landing-zone/lab_upload
+    destination_path: s3://ingestkit-destination
+    batch_size_gb: 4
+    retry_limit: 3
+    chunk_size_mb: 16
+    gene_panel: [SF3B1, TP53, ASXL1, TET2, DNMT3A, RUNX1]
+    runner_type: kubernetes
+    kubernetes_namespace: ingestkit
