@@ -1,0 +1,20 @@
+source_path: ./sample_data/lab_upload
+destination_path: ./sample_data/destination
+state_database_url: sqlite:///ingestkit_state.db
+
+batch_size_gb: 4
+max_workers: 4
+
+retry_limit: 3
+retry_delay_seconds: 1
+chunk_size_mb: 8
+
+case_id_pattern: "^([^._]+)"
+
+gene_panel: [SF3B1, TP53, ASXL1, TET2, DNMT3A, RUNX1]
+min_variant_depth: 100
+min_variant_vaf: 0.05
+clinical_required_fields: [case_id, age, sex, diagnosis]
+clinical_identifier_fields: [name, patient_name, birth_date, address, phone, email]
+
+runner_type: local
